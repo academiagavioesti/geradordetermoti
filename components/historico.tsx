@@ -7,7 +7,8 @@ import { entriesToCsv, useLog, type LogEntry } from "@/lib/log"
 import { generateDevolucaoPdf, generateTermoPdf, slugify } from "@/lib/generate-pdf"
 import { CONDICOES_DEVOLUCAO, getTermoDevolucao, getTermoRecebimento, getTermoResponsabilidade, type Block, type CondicaoDevolucao, type Devolucao, type TermoData } from "@/lib/termos"
 
-type Entry = LogEntry & { status?: string; devolvido_em?: string | null }
+export type Entry = LogEntry & { status?: string; devolvido_em?: string | null }
+export type PreviewTab = "responsabilidade" | "recebimento" | "devolucao"
 type Detail = { termo: TermoData; devolucao?: Devolucao | null; status?: string; unidade?: string; tipo_label?: string; marca?: string; modelo?: string; specific_value?: string; data_termo?: string; created_by_nome?: string }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -23,11 +24,11 @@ const STATUS_STYLE: Record<string, string> = {
   registrado: "bg-emerald-500/10 text-emerald-800 ring-emerald-600/20 dark:text-emerald-300",
 }
 
-function initials(name: string) {
+export function initials(name: string) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "?"
 }
 
-function StatusBadge({ status }: { status?: string }) {
+export function StatusBadge({ status }: { status?: string }) {
   const key = status ?? "termo_gerado"
   return (
     <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${STATUS_STYLE[key] ?? STATUS_STYLE.termo_gerado}`}>
@@ -69,11 +70,11 @@ function DocumentPreview({ blocks, signers, collaboratorName, singleSignature = 
   )
 }
 
-function TermPreview({ entry, onClose }: { entry: Entry; onClose: () => void }) {
+export function TermPreview({ entry, onClose, initialTab = "responsabilidade" }: { entry: Entry; onClose: () => void; initialTab?: PreviewTab }) {
   const [detail, setDetail] = useState<Detail | null>(null)
   const [loading, setLoading] = useState(true)
   const [problem, setProblem] = useState<string | null>(null)
-  const [tab, setTab] = useState<"responsabilidade" | "recebimento" | "devolucao">("responsabilidade")
+  const [tab, setTab] = useState<PreviewTab>(initialTab)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -178,13 +179,13 @@ function toBr(iso: string) {
   const [year, month, day] = iso.split("-")
   return `${day}/${month}/${year}`
 }
-function shortDate(iso?: string | null) {
+export function shortDate(iso?: string | null) {
   if (!iso) return ""
   const date = new Date(iso)
   return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("pt-BR")
 }
 
-function ReturnDialog({ entry, onClose, onSaved }: { entry: Entry; onClose: () => void; onSaved: () => void }) {
+export function ReturnDialog({ entry, onClose, onSaved }: { entry: Entry; onClose: () => void; onSaved: () => void }) {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10))
   const [condition, setCondition] = useState<CondicaoDevolucao>("bom")
   const [notes, setNotes] = useState("")
@@ -254,6 +255,7 @@ export function Historico() {
   const [query, setQuery] = useState("")
   const [filter, setFilter] = useState("")
   const [selected, setSelected] = useState<Entry | null>(null)
+  const [selectedTab, setSelectedTab] = useState<PreviewTab>("responsabilidade")
   const [returning, setReturning] = useState<Entry | null>(null)
   const [situation, setSituation] = useState("")
   const closeReturn = useCallback(() => setReturning(null), [])
@@ -349,7 +351,7 @@ export function Historico() {
                   <td className="sticky right-0 bg-card px-5 py-3.5 group-hover:bg-accent/50">
                     <div className="flex items-center justify-end gap-1">
                       {!entry.devolvido_em && <button type="button" onClick={() => setReturning(entry)} aria-label={`Registrar devolução de ${entry.nome}`} title="Registrar devolução" className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-primary/10 hover:text-primary"><Undo2 className="size-4" aria-hidden="true" /></button>}
-                      <button type="button" onClick={() => setSelected(entry)} aria-label={`Ver termo de ${entry.nome}`} title="Ver termo" className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-primary/10 hover:text-primary"><Eye className="size-4" aria-hidden="true" /></button>
+                      <button type="button" onClick={() => { setSelectedTab("responsabilidade"); setSelected(entry) }} aria-label={`Ver termo de ${entry.nome}`} title="Ver termo" className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-primary/10 hover:text-primary"><Eye className="size-4" aria-hidden="true" /></button>
                       <button type="button" onClick={() => { if (window.confirm("Excluir este registro?")) void remove(entry.id) }} aria-label={`Excluir termo de ${entry.nome}`} title="Excluir" className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive"><Trash2 className="size-4" aria-hidden="true" /></button>
                     </div>
                   </td>
@@ -359,8 +361,8 @@ export function Historico() {
           </table>
         </div>
       </div>
-      {selected && <TermPreview entry={selected} onClose={closePreview} />}
-      {returning && <ReturnDialog entry={returning} onClose={closeReturn} onSaved={() => { setReturning(null); void reload() }} />}
+      {selected && <TermPreview key={`${selected.id}-${selectedTab}`} entry={selected} initialTab={selectedTab} onClose={closePreview} />}
+      {returning && <ReturnDialog entry={returning} onClose={closeReturn} onSaved={() => { const done = returning; setReturning(null); void reload(); setSelectedTab("devolucao"); setSelected(done) }} />}
     </>
   )
 }
