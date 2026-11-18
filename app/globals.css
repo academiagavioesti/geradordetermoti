@@ -51,7 +51,7 @@
 :root {
   color-scheme: light;
   /* Paleta alinhada à tela de login (fundo claro, azul-marinho, vermelho #f04444) */
-  --background: #f8fafc;
+  --background: #f6f8fb;
   --foreground: #172d50;
   --card: #ffffff;
   --card-foreground: #172d50;
@@ -82,7 +82,7 @@
   --sidebar-accent-foreground: #172d50;
   --sidebar-border: #d9e0ea;
   --sidebar-ring: #f04444;
-  --radius: 0.625rem;
+  --radius: 0.75rem;
 }
 
 .dark {
@@ -136,6 +136,12 @@
   button, input, select, textarea { transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease, opacity 150ms ease; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .tabular-nums { font-variant-numeric: tabular-nums; }
+  body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  ::selection { background: color-mix(in oklab, var(--primary) 22%, transparent); }
+  button:not(:disabled), [role="tab"], select { cursor: pointer; }
+  button:not(:disabled):active { transform: translateY(1px); }
+  input::placeholder { color: color-mix(in oklab, var(--muted-foreground) 70%, transparent); }
+  * { scrollbar-width: thin; scrollbar-color: color-mix(in oklab, var(--muted-foreground) 35%, transparent) transparent; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
   html {
     @apply font-sans;
