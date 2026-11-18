@@ -3,14 +3,14 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef, useState, type KeyboardEvent } from "react"
-import { FileText, LayoutDashboard, History, Settings, Kanban, Menu, X, Sun, Moon, LogOut } from "lucide-react"
+import { FileText, LayoutDashboard, History, Settings, Kanban, Menu, X, Sun, Moon, LogOut, Undo2 } from "lucide-react"
 import { useTheme } from "@/lib/theme"
 import { createClient } from "@/lib/supabase/client"
 import { useProfile } from "@/lib/use-profile"
 import { LOGO_GAVIOES_PNG } from "@/lib/logo-data"
 import { GaviaoIcon } from "@/components/gaviao-icon"
 
-const mainLinks = [{ href: "/", label: "Gerar termo", icon: FileText }, { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }, { href: "/quadro", label: "Quadro", icon: Kanban }, { href: "/historico", label: "Histórico", icon: History }]
+const mainLinks = [{ href: "/", label: "Gerar termo", icon: FileText }, { href: "/devolucao", label: "Devolução", icon: Undo2 }, { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }, { href: "/quadro", label: "Quadro", icon: Kanban }, { href: "/historico", label: "Histórico", icon: History }]
 const settingsLink = { href: "/configuracoes", label: "Configurações", icon: Settings }
 function isActive(pathname: string, href: string) { return href === "/" ? pathname === href : pathname.startsWith(href) }
 type LinkIcon = typeof FileText
