@@ -69,3 +69,27 @@ export function getTermoRecebimento(data: TermoData): Block[] {
     { type: "paragraph", text: `Unidade: ${data.company.unidadeRazaoSocial}` }, { type: "paragraph", text: `CNPJ: ${data.company.unidadeCnpj}` }, { type: "paragraph", text: `Data: ${data.colaborador.data}` }, { type: "spacer", size: 2 }, { type: "paragraph", text: "Assinatura do Recebedor:" },
   ]
 }
+
+export const CONDICOES_DEVOLUCAO = {
+  bom: "Bom estado de conservação e funcionamento",
+  desgaste: "Com desgaste normal de uso",
+  avaria: "Com avaria",
+} as const
+export type CondicaoDevolucao = keyof typeof CONDICOES_DEVOLUCAO
+export type Devolucao = { data: string; condicao: CondicaoDevolucao; observacoes: string; acessorios: string }
+
+export function getTermoDevolucao(data: TermoData, devolucao: Devolucao): Block[] {
+  const nomeEquip = getEquipmentName(data.equipamento)
+  const nome = data.colaborador.nome || "________________"
+  const observacoes = devolucao.observacoes.trim()
+  return [
+    { type: "title", text: `TERMO DE DEVOLUÇÃO DE ${nomeEquip.toUpperCase()}` }, { type: "spacer", size: 3 },
+    { type: "paragraph", text: `Eu, ${nome}, declaro que devolvi à empresa ${data.company.nomeMarca} o ${nomeEquip} abaixo descrito, nas condições registradas neste termo.` },
+    { type: "spacer", size: 2 }, { type: "heading", text: "Informações do Equipamento:" },
+    { type: "bullet", text: `Modelo: ${data.equipamento.modelo || ""}` }, { type: "bullet", text: `Marca: ${data.equipamento.marca || ""}` }, { type: "bullet", text: `Número de série / identificação: ${data.equipamento.specificValue || ""}` }, { type: "bullet", text: `Acessórios devolvidos (se houver): ${devolucao.acessorios || ""}` },
+    { type: "spacer", size: 2 }, { type: "heading", text: "Condição do Equipamento na Devolução:" },
+    { type: "bullet", text: `Estado: ${CONDICOES_DEVOLUCAO[devolucao.condicao] ?? ""}` }, { type: "bullet", text: `Observações: ${observacoes || "Nenhuma."}` },
+    { type: "spacer", size: 2 }, { type: "paragraph", text: `A partir da data desta devolução, o ${nomeEquip} retorna à guarda da empresa e cessa a responsabilidade do colaborador sobre ele, ressalvadas as observações acima.` }, { type: "spacer", size: 2 },
+    { type: "paragraph", text: `Unidade: ${data.company.unidadeRazaoSocial}` }, { type: "paragraph", text: `CNPJ: ${data.company.unidadeCnpj}` }, { type: "paragraph", text: `Data da devolução: ${devolucao.data}` },
+  ]
+}

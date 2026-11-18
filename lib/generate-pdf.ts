@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf"
-import { getTermoRecebimento, getTermoResponsabilidade, type Block, type TermoData } from "./termos"
+import { getTermoDevolucao, getTermoRecebimento, getTermoResponsabilidade, type Block, type Devolucao, type TermoData } from "./termos"
 import { LOGO_GAVIOES_PNG } from "./logo-data"
 
 const PAGE_W = 210, PAGE_H = 297, MARGIN_X = 20, MARGIN_TOP = 22, MARGIN_BOTTOM = 24, CONTENT_W = PAGE_W - MARGIN_X * 2, LINE_H = 6
@@ -42,4 +42,5 @@ class PdfWriter {
 }
 
 export function generateTermoPdf(data: TermoData): jsPDF { const w = new PdfWriter(); w.addResponsibilityHeader(); for (const block of getTermoResponsabilidade(data)) w.renderBlock(block); w.renderSignatures(data.signers); w.addPage(); for (const block of getTermoRecebimento(data)) w.renderBlock(block); w.renderSingleSignature(data.colaborador.nome); return w.doc }
-export function slugify(text: string): string { return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase() }
+export function generateDevolucaoPdf(data: TermoData, devolucao: Devolucao): jsPDF { const w = new PdfWriter(); w.addResponsibilityHeader(); for (const block of getTermoDevolucao(data, devolucao)) w.renderBlock(block); w.renderSignatures(data.signers); return w.doc }
+export function slugify(text: string): string { return text.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase() }
