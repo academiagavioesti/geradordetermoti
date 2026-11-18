@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useMemo, useState } from "react"
-import { ArrowRight, CheckCircle2, Clock, FileText, Layers, Sparkles, TrendingDown, TrendingUp } from "lucide-react"
+import { ArrowRight, CheckCircle2, Clock, FileText, Layers, TrendingDown, TrendingUp } from "lucide-react"
 import { useLog, type LogEntry } from "@/lib/log"
 
 type Entry = LogEntry & { status?: string; status_changed_at?: string }
@@ -342,26 +342,8 @@ export function DashboardView({ entries }: { entries: Entry[] }) {
     }
   }, [entries, period])
   const total = data.current.length
-  const headline = data.late.length > 0
-    ? `${data.late.length} ${data.late.length === 1 ? "termo aguarda" : "termos aguardam"} assinatura há mais de 3 dias`
-    : data.waiting > 0
-      ? `${data.waiting} ${data.waiting === 1 ? "termo aguarda" : "termos aguardam"} assinatura, sem atrasos`
-      : "Tudo em dia: nenhum termo aguardando assinatura"
   return (
     <div className="grid gap-4">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-[#b91c1c] p-5 text-white shadow-sm sm:p-6">
-        <span className="pointer-events-none absolute -right-10 -top-16 size-48 rounded-full bg-white/10" aria-hidden="true" />
-        <span className="pointer-events-none absolute -bottom-20 right-24 size-40 rounded-full bg-white/5" aria-hidden="true" />
-        <div className="relative flex flex-wrap items-center justify-between gap-4">
-          <div className="min-w-0">
-            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-white/80"><Sparkles className="size-3.5" aria-hidden="true" />Resumo</p>
-            <p className="mt-1 text-2xl font-semibold leading-tight sm:text-3xl" style={HEADING_FONT}>{headline}</p>
-            <p className="mt-1 text-sm text-white/80">{entries.length} {entries.length === 1 ? "termo registrado" : "termos registrados"} no total.</p>
-          </div>
-          <Link href="/quadro" className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-primary shadow-sm transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary">Abrir quadro<ArrowRight className="size-4" aria-hidden="true" /></Link>
-        </div>
-      </div>
-
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div role="group" aria-label="Período" className="inline-flex rounded-xl border border-border bg-muted p-1">
           {PERIODS.map((item) => <button key={item.value} type="button" aria-pressed={period === item.value} onClick={() => setPeriod(item.value)} className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${period === item.value ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>{item.label}</button>)}
@@ -439,7 +421,7 @@ export function DashboardView({ entries }: { entries: Entry[] }) {
 
 export function Dashboard() {
   const { entries, loaded, error, reload } = useLog()
-  if (!loaded) return <div className="grid gap-4" role="status" aria-label="Carregando painel"><div className="h-28 animate-pulse rounded-2xl bg-muted" /><div className="h-10 w-64 animate-pulse rounded-xl bg-muted" /><div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">{Array.from({ length: 5 }, (_, index) => <div key={index} className="h-36 animate-pulse rounded-2xl bg-muted" />)}</div><div className="grid gap-4 lg:grid-cols-12"><div className="h-72 animate-pulse rounded-2xl bg-muted lg:col-span-8" /><div className="h-72 animate-pulse rounded-2xl bg-muted lg:col-span-4" /></div></div>
+  if (!loaded) return <div className="grid gap-4" role="status" aria-label="Carregando painel"><div className="h-10 w-64 animate-pulse rounded-xl bg-muted" /><div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">{Array.from({ length: 5 }, (_, index) => <div key={index} className="h-36 animate-pulse rounded-2xl bg-muted" />)}</div><div className="grid gap-4 lg:grid-cols-12"><div className="h-72 animate-pulse rounded-2xl bg-muted lg:col-span-8" /><div className="h-72 animate-pulse rounded-2xl bg-muted lg:col-span-4" /></div></div>
   if (error) return <div className="grid gap-3"><p className="text-destructive">{error}</p><button type="button" onClick={() => void reload()} className="w-fit rounded-md border border-border px-3 py-2 text-sm hover:bg-accent">Tentar novamente</button></div>
   return <DashboardView entries={entries as Entry[]} />
 }
